@@ -5,7 +5,8 @@ import { useVideoPlayer, VideoView } from 'expo-video';
 export default function App() {
   const videoSource = "http://sanstv.com:2052/live/02078356168270/JFQ9IXEDvsTOZrx/2392114.ts";
 
-  const player = useVideoPlayer(videoSource, player => {
+  // استخدام الصيغة المحدثة والمتوافقة مع SDK 52
+  const player = useVideoPlayer({ uri: videoSource }, player => {
     player.loop = false;
     player.play();
   });
