@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "sur TV",
+    "slug": "sur-tv",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "android": {
+      "package": "com.othmanetech.surtv"
+    }
+  }
+}
