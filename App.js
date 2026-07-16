@@ -16,7 +16,7 @@ import { useVideoPlayer, VideoView } from 'expo-video';
 
 const { width, height } = Dimensions.get('window');
 
-// 1. قاعدة بيانات القنوات والأقسام المحدثة والشاملة
+// 1. قاعدة بيانات القنوات والأقسام
 const DATA = [
   {
     id: '1',
@@ -73,9 +73,18 @@ const DATA = [
   }
 ];
 
-// مكون مشغل الفيديو المستقل
+// المكون الذكي لمشغل الفيديو متجاوز الحظر والصيغ المعقدة
 const VideoPlayerComponent = ({ url }) => {
-  const player = useVideoPlayer(url, (playerInstance) => {
+  // نقوم بتمرير مصدر الفيديو ككائن تفصيلي يحتوي على الهوية (User-Agent) والنوعية (MimeType)
+  const player = useVideoPlayer({
+    uri: url,
+    mimeType: 'video/mp2t', // إجبار أندرويد على قراءة البث كصيغة MPEG-TS فورية
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+      'Accept': '*/*',
+      'Connection': 'keep-alive'
+    }
+  }, (playerInstance) => {
     playerInstance.loop = false;
     playerInstance.play();
   });
@@ -96,7 +105,6 @@ export default function App() {
   const [activeChannel, setActiveChannel] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
 
-  // إخفاء الشاشة الترحيبية بعد 3 ثوانٍ
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
@@ -104,7 +112,6 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // دالة فتح الروابط الخارجية (سوشيال ميديا)
   const openSocialLink = (url) => {
     setShowMenu(false);
     Linking.openURL(url).catch(err => console.error("Couldn't open link", err));
@@ -129,12 +136,11 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0c0c0e" />
       
-      {/* مشغل الفيديو الديناميكي */}
       {activeChannel ? (
         <View style={styles.playerWrapper}>
           <VideoPlayerComponent url={activeChannel.url} />
           <View style={styles.playerInfoRow}>
-            <View style={{ flexDirection: 'row-reverse', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={styles.liveDot} />
               <Text style={styles.activeChannelTitle}>{activeChannel.name}</Text>
             </View>
@@ -147,7 +153,6 @@ export default function App() {
           </View>
         </View>
       ) : (
-        /* هيدر التطبيق الرئيسي */
         <View style={styles.header}>
           <Text style={styles.headerLogo}>sur TV</Text>
           <TouchableOpacity 
@@ -159,7 +164,6 @@ export default function App() {
         </View>
       )}
 
-      {/* القائمة العمودية المنسدلة (السوشيال ميديا) */}
       {showMenu && (
         <View style={styles.menuDropdownContainer}>
           <Text style={styles.menuDropdownTitle}>روابط التواصل الاجتماعي</Text>
@@ -194,7 +198,6 @@ export default function App() {
         </View>
       )}
 
-      {/* قائمة الأقسام (تصفح أفقي) */}
       <View style={styles.categoriesContainer}>
         <FlatList
           horizontal
@@ -208,7 +211,7 @@ export default function App() {
                 style={[styles.categoryTab, isActive && styles.activeCategoryTab]}
                 onPress={() => {
                   setSelectedCategory(item.category);
-                  setShowMenu(false); // إغلاق القائمة عند اختيار تصنيف
+                  setShowMenu(false);
                 }}
               >
                 <Text style={[styles.categoryTabText, isActive && styles.activeCategoryTabText]}>
@@ -221,7 +224,6 @@ export default function App() {
         />
       </View>
 
-      {/* شبكة القنوات التابعة للقسم المختار */}
       <View style={styles.channelsContainer}>
         <FlatList
           data={currentChannels}
@@ -233,7 +235,7 @@ export default function App() {
               style={styles.channelCard}
               onPress={() => {
                 setActiveChannel(item);
-                setShowMenu(false); // إغلاق القائمة عند بدء التشغيل
+                setShowMenu(false);
               }}
               activeOpacity={0.8}
             >
@@ -258,7 +260,6 @@ export default function App() {
   );
 }
 
-// التنسيقات الفخمة والعصرية
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -289,7 +290,7 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
   header: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -302,7 +303,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#00d2ff',
   },
-  // تصميم زر القائمة تواصل المذهل بديل مباشر
   menuButton: {
     backgroundColor: '#ff003c',
     paddingHorizontal: 14,
@@ -319,11 +319,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: 'bold',
   },
-  // تصميم القائمة العمودية المنسدلة
   menuDropdownContainer: {
     position: 'absolute',
     top: 65,
-    right: 20,
+    left: 20,
     backgroundColor: '#121214',
     borderWidth: 1.5,
     borderColor: '#ff003c',
@@ -367,7 +366,7 @@ const styles = StyleSheet.create({
     height: 220,
   },
   playerInfoRow: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -381,7 +380,7 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: '#ff003c',
-    marginRight: 8,
+    marginLeft: 8,
   },
   activeChannelTitle: {
     color: '#fff',
@@ -443,7 +442,7 @@ const styles = StyleSheet.create({
   },
   channelInfo: {
     padding: 10,
-    alignItems: 'flex-start',
+    alignItems: 'flex-end',
   },
   channelName: {
     color: '#fff',
@@ -452,7 +451,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   liveIndicatorContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
   },
   greenDot: {
@@ -460,7 +459,7 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
     backgroundColor: '#4caf50',
-    marginRight: 5,
+    marginLeft: 5,
   },
   liveText: {
     color: '#4caf50',
