@@ -9,41 +9,71 @@ import {
   SafeAreaView, 
   StatusBar, 
   ActivityIndicator,
-  Dimensions
+  Dimensions,
+  Linking
 } from 'react-native';
 import { useVideoPlayer, VideoView } from 'expo-video';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-// 1. قاعدة بيانات القنوات والأقسام (يمكنك تعديلها وإضافة قنواتك الخاصة هنا)
+// 1. قاعدة بيانات القنوات والأقسام المحدثة والشاملة
 const DATA = [
   {
     id: '1',
     category: 'قنوات رياضية',
     channels: [
-      { id: '101', name: 'beIN SPORTS HD', logo: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=150', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
-      { id: '102', name: 'SSC Sports', logo: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=150', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+      { id: '101', name: 'BEIN MAX 1 SD', logo: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=300', url: 'http://sanstv.com:2052/live/02078356168270/JFQ9IXEDvsTOZrx/2159465.ts' },
+      { id: '102', name: 'BEIN MAX 2 SD', logo: 'https://images.unsplash.com/photo-1518063319789-7217e6706b04?w=300', url: 'http://sanstv.com:2052/live/02078356168270/JFQ9IXEDvsTOZrx/2159466.ts' },
+      { id: '103', name: 'BEIN MAX 3 SD', logo: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=300', url: 'http://sanstv.com:2052/live/02078356168270/JFQ9IXEDvsTOZrx/2392071.ts' },
+      { id: '104', name: 'BEIN MAX 4 SD', logo: 'https://images.unsplash.com/photo-1540747737956-378724044602?w=300', url: 'http://sanstv.com:2052/live/02078356168270/JFQ9IXEDvsTOZrx/2392072.ts' },
     ]
   },
   {
     id: '2',
-    category: 'قنوات إخبارية',
+    category: 'قنوات أطفال',
     channels: [
-      { id: '201', name: 'الجزيرة الإخبارية', logo: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=150', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
-      { id: '202', name: 'العربية مباشر', logo: 'https://images.unsplash.com/photo-1495020689067-958852a6565d?w=150', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+      { id: '201', name: 'سبيستون (Spacetoon)', logo: 'https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+      { id: '202', name: 'كرتون نتورك (CN)', logo: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+      { id: '203', name: 'طيور الجنة', logo: 'https://images.unsplash.com/photo-1515488042361-404e9250afef?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' }
     ]
   },
   {
     id: '3',
+    category: 'قسم مسلسلات',
+    channels: [
+      { id: '301', name: 'مسلسل قيامة أرطغرل', logo: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+      { id: '302', name: 'مسلسل صراع العروش', logo: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+      { id: '303', name: 'المسلسلات التاريخية', logo: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' }
+    ]
+  },
+  {
+    id: '4',
+    category: 'قسم أفلام',
+    channels: [
+      { id: '401', name: 'فيلم الأكشن والقتال', logo: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+      { id: '402', name: 'فيلم الخيال العلمي', logo: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+      { id: '403', name: 'سينما هوليوود HD', logo: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' }
+    ]
+  },
+  {
+    id: '5',
+    category: 'قنوات إخبارية',
+    channels: [
+      { id: '501', name: 'الجزيرة الإخبارية', logo: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+      { id: '502', name: 'العربية مباشر', logo: 'https://images.unsplash.com/photo-1495020689067-958852a6565d?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+    ]
+  },
+  {
+    id: '6',
     category: 'قنوات إسلامية',
     channels: [
-      { id: '301', name: 'قناة القرآن الكريم', logo: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
-      { id: '302', name: 'قناة السنة النبوية', logo: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=150', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+      { id: '601', name: 'قناة القرآن الكريم', logo: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
+      { id: '602', name: 'قناة السنة النبوية', logo: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=300', url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8' },
     ]
   }
 ];
 
-// مكون مشغل الفيديو المستقل لمنع إعادة التحميل العشوائي
+// مكون مشغل الفيديو المستقل
 const VideoPlayerComponent = ({ url }) => {
   const player = useVideoPlayer(url, (playerInstance) => {
     playerInstance.loop = false;
@@ -64,8 +94,9 @@ export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(DATA[0].category);
   const [activeChannel, setActiveChannel] = useState(null);
+  const [showMenu, setShowMenu] = useState(false);
 
-  // إخفاء الشاشة الترحيبية بعد 3 ثوانٍ تلقائياً
+  // إخفاء الشاشة الترحيبية بعد 3 ثوانٍ
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
@@ -73,10 +104,14 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // تصفية القنوات بناءً على القسم النشط
+  // دالة فتح الروابط الخارجية (سوشيال ميديا)
+  const openSocialLink = (url) => {
+    setShowMenu(false);
+    Linking.openURL(url).catch(err => console.error("Couldn't open link", err));
+  };
+
   const currentChannels = DATA.find(item => item.category === selectedCategory)?.channels || [];
 
-  // 1. عرض واجهة الشاشة الترحيبية الأنيقة (Splash Screen)
   if (showSplash) {
     return (
       <View style={styles.splashContainer}>
@@ -90,17 +125,16 @@ export default function App() {
     );
   }
 
-  // 2. عرض الواجهة الرئيسية للتطبيق (بعد تصفح الأقسام والقنوات)
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0c0c0e" />
       
-      {/* مشغل الفيديو الديناميكي (يظهر فقط عند اختيار قناة) */}
+      {/* مشغل الفيديو الديناميكي */}
       {activeChannel ? (
         <View style={styles.playerWrapper}>
           <VideoPlayerComponent url={activeChannel.url} />
           <View style={styles.playerInfoRow}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center' }}>
               <View style={styles.liveDot} />
               <Text style={styles.activeChannelTitle}>{activeChannel.name}</Text>
             </View>
@@ -113,16 +147,54 @@ export default function App() {
           </View>
         </View>
       ) : (
-        /* هيدر التطبيق (يظهر فقط في وضع التصفح) */
+        /* هيدر التطبيق الرئيسي */
         <View style={styles.header}>
           <Text style={styles.headerLogo}>sur TV</Text>
-          <View style={styles.headerBadge}>
-            <Text style={styles.headerBadgeText}>مباشر</Text>
-          </View>
+          <TouchableOpacity 
+            style={styles.menuButton} 
+            onPress={() => setShowMenu(!showMenu)}
+          >
+            <Text style={styles.menuButtonText}>☰ تواصل</Text>
+          </TouchableOpacity>
         </View>
       )}
 
-      {/* قائمة الأقسام (أفقية للتنقل السريع) */}
+      {/* القائمة العمودية المنسدلة (السوشيال ميديا) */}
+      {showMenu && (
+        <View style={styles.menuDropdownContainer}>
+          <Text style={styles.menuDropdownTitle}>روابط التواصل الاجتماعي</Text>
+          
+          <TouchableOpacity 
+            style={styles.menuDropdownItem} 
+            onPress={() => openSocialLink('https://t.me/surtv_official')}
+          >
+            <Text style={styles.menuDropdownItemText}>✈️ تليجرام (Telegram)</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.menuDropdownItem} 
+            onPress={() => openSocialLink('https://wa.me/212600000000')}
+          >
+            <Text style={styles.menuDropdownItemText}>💬 واتساب (WhatsApp)</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.menuDropdownItem} 
+            onPress={() => openSocialLink('https://facebook.com/surtv')}
+          >
+            <Text style={styles.menuDropdownItemText}>🔵 فيسبوك (Facebook)</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.menuDropdownItem, { borderBottomWidth: 0 }]} 
+            onPress={() => setShowMenu(false)}
+          >
+            <Text style={[styles.menuDropdownItemText, { color: '#ff003c', textAlign: 'center' }]}>✕ إغلاق القائمة</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* قائمة الأقسام (تصفح أفقي) */}
       <View style={styles.categoriesContainer}>
         <FlatList
           horizontal
@@ -134,7 +206,10 @@ export default function App() {
             return (
               <TouchableOpacity 
                 style={[styles.categoryTab, isActive && styles.activeCategoryTab]}
-                onPress={() => setSelectedCategory(item.category)}
+                onPress={() => {
+                  setSelectedCategory(item.category);
+                  setShowMenu(false); // إغلاق القائمة عند اختيار تصنيف
+                }}
               >
                 <Text style={[styles.categoryTabText, isActive && styles.activeCategoryTabText]}>
                   {item.category}
@@ -152,11 +227,14 @@ export default function App() {
           data={currentChannels}
           keyExtractor={(item) => item.id}
           numColumns={2}
-          key={selectedCategory} // لإعادة تهيئة القائمة بسلاسة عند تغيير القسم
+          key={selectedCategory} 
           renderItem={({ item }) => (
             <TouchableOpacity 
               style={styles.channelCard}
-              onPress={() => setActiveChannel(item)}
+              onPress={() => {
+                setActiveChannel(item);
+                setShowMenu(false); // إغلاق القائمة عند بدء التشغيل
+              }}
               activeOpacity={0.8}
             >
               <Image 
@@ -180,13 +258,12 @@ export default function App() {
   );
 }
 
-// التنسيقات الجمالية والألوان النيونية والداكنة
+// التنسيقات الفخمة والعصرية
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0c0c0e',
   },
-  // تنسيقات الشاشة الترحيبية
   splashContainer: {
     flex: 1,
     backgroundColor: '#0c0c0e',
@@ -211,9 +288,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontWeight: '300',
   },
-  // الهيدر
   header: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -226,18 +302,62 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#00d2ff',
   },
-  headerBadge: {
+  // تصميم زر القائمة تواصل المذهل بديل مباشر
+  menuButton: {
     backgroundColor: '#ff003c',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 8,
+    shadowColor: '#ff003c',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  headerBadgeText: {
+  menuButtonText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: 'bold',
   },
-  // مشغل الفيديو العلوي
+  // تصميم القائمة العمودية المنسدلة
+  menuDropdownContainer: {
+    position: 'absolute',
+    top: 65,
+    right: 20,
+    backgroundColor: '#121214',
+    borderWidth: 1.5,
+    borderColor: '#ff003c',
+    borderRadius: 12,
+    width: width * 0.6,
+    zIndex: 9999,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  menuDropdownTitle: {
+    color: '#a0a0a5',
+    fontSize: 11,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1f1f26',
+    paddingBottom: 6,
+  },
+  menuDropdownItem: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1f1f26',
+  },
+  menuDropdownItemText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'right',
+  },
   playerWrapper: {
     width: '100%',
     backgroundColor: '#000',
@@ -247,7 +367,7 @@ const styles = StyleSheet.create({
     height: 220,
   },
   playerInfoRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -261,7 +381,7 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: '#ff003c',
-    marginLeft: 8,
+    marginRight: 8,
   },
   activeChannelTitle: {
     color: '#fff',
@@ -279,7 +399,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
-  // تصنيفات الأقسام
   categoriesContainer: {
     marginVertical: 15,
   },
@@ -304,7 +423,6 @@ const styles = StyleSheet.create({
   activeCategoryTabText: {
     color: '#0c0c0e',
   },
-  // قائمة القنوات الشبكية
   channelsContainer: {
     flex: 1,
   },
@@ -325,7 +443,7 @@ const styles = StyleSheet.create({
   },
   channelInfo: {
     padding: 10,
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
   },
   channelName: {
     color: '#fff',
@@ -334,7 +452,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   liveIndicatorContainer: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
   },
   greenDot: {
@@ -342,7 +460,7 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
     backgroundColor: '#4caf50',
-    marginLeft: 5,
+    marginRight: 5,
   },
   liveText: {
     color: '#4caf50',
